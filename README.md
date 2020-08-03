@@ -1,5 +1,6 @@
 # work5
 ### PHP
+
 :black_square_button:    
 -----
 
@@ -12,7 +13,8 @@
 
 ### SQL
 
-:black_square_button:    
+:white_check_mark:     
+> time left: 15 min
 
 -----
 Есть 2 таблицы
@@ -45,3 +47,4 @@
 
 ### Docker
 :white_check_mark: 
+> time left: 15 min
