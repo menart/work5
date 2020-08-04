@@ -6,26 +6,123 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <style>
+        .card {
+            float: left;
+            width: 400px;
+            height: 300px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            padding: 5px;
+            text-align: center;
+            margin: 10px;
+            box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        input {
+            width: 380px;
+        }
+
+        a {
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            width: 200px;
+            height: 40px;
+            margin: 10px;
+            line-height: 40px;
+            background-color: darkblue;
+            border: 1px solid darkblue;
+            color: white;
+        }
+
+        .box {
+            margin: 10px auto;
+            width: 1000px;
+        }
+    </style>
 </head>
 <body>
-Введите логин и пароль
-<div class="authUser">
-    Логин:    <input type="text" name="login_auth" placeholder="Логин">
-    Пароль: <input type="pwd_auth" name="pwd">
-    <a href="#" id="auth">Войти</a>
+<div class="box">
+    <div id="authUser" class="card">
+        <h3>Введите логин и пароль</h3>
+        <span>Логин:</span> <input type="text" id="login_auth" name="login_auth" placeholder="Логин">
+        <span>Пароль:</span> <input type="password" name="pwd_auth" id="pwd_auth">
+        <a href="#" id="auth">Войти</a>
+    </div>
+    <div id="regUser" class="card">
+        <h3>Или зарегистрируйтесь</h3>
+        <span>Логин</span><input type="text" name="login" placeholder="логин">
+        <span>Фамилия И.О.</span><input type="text" name="fio" placeholder="Фамилия И.О.">
+        <span>E-Mail</span><input type="text" name="email" placeholder="email">
+        <span>Пароль</span><input type="password" name="pwd">
+        <a href="#" id="reg">Зарегистрироваться</a>
+    </div>
 </div>
-<p>Или зарегистрируйтесь</p>
-<div class="regUser">
-    логин<input type="text" name="login" placeholder="логин">
-    Фамилия И.О.<input type="text" name="fio" placeholder="Фамилия И.О.">
-    email<input type="text" name="email" placeholder="email">
-    пароль<input type="password" name="pwd">
-    <a href="#" id="reg">Зарегистрироваться</a>
-</div>
-
 <script>
-    const API_URL ='point.php';
-    
+    const API_URL = 'point.php';
+
+    const authBtn = document.getElementById('authUser'),
+        regUser = document.getElementById('regUser'),
+        loginAuth = document.getElementById('login_auth'),
+        pwdAuth = document.getElementById('pwd_auth'),
+        login= document.getElementById('login'),
+        pwd = document.getElementById('pwd'),
+        email = document.getElementById('email'),
+        fio = document.getElementById('fio');
+
+
+    const DBQuery = class {
+        getData = async (url, body) => {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+                },
+                body: body
+            });
+            if (res.ok) {
+                return res.json();
+            } else {
+                throw new Error(`По адресу ${url} сервер вернул ${res.status}`);
+            }
+        }
+
+        getAuth = (login, pwd) => {
+            let body = 'login=' + login + '&pwd=' + pwd;
+            return this.getData(`${API_URL}?action=auth`, body)
+        }
+
+        getCreateUser = (login, pwd, email, fio) => {
+            let body = 'login=' + login + '&pwd=' + pwd + '&email=' + email + '&fio=' + fio;
+            return this.getData(`${API_URL}?action=create`, body)
+        }
+
+        getCard = (id) => this.getData(`${API_URL}tv/${id}?api_key=${API_KEY}&language=ru-RU`);
+    }
+
+    const auth = (login, pwd, email, fio) => {
+        new DBQuery().getCreateUser(login, pwd, email, fio).then(alert(1));
+    }
+
+    const create = (login, pwd) => {
+        new DBQuery().getAuth(login, pwd).then(alert(1));
+    }
+
+    authBtn.addEventListener('click', () => {
+        let login = loginAuth.value.trim();
+        let pwd = pwdAuth.value.trim();
+        new DBQuery().getAuth(login, pwd).then(alert(1));
+    });
+
+    regUser.addEventListener('click', () => {
+        let login = login.value.trim();
+        let pwd = pwd.value.trim();
+        let email = email.value.trim();
+        let fio = fio.value.trim();
+        new DBQuery().getCreateUser(login, pwd, email, fio).then(alert(1));
+    });
 </script>
 
 </body>
