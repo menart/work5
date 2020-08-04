@@ -19,7 +19,7 @@ class Action
 
         $this->db = MySqlDB::getInstance(DB_HOST, DB_BASE, DB_USER, DB_PWD);
         session_start();
-        echo $_SESSION['user'];
+
         switch ($action) {
             case 'auth':
                 $this->auth($login, $pwd);
@@ -30,7 +30,7 @@ class Action
             case 'create':
                 $this->createUser($login, $pwd, $email, $fio);
                 break;
-            case 'change':
+            case 'edit':
                 $this->changeUser($login, $pwd, $email, $fio);
                 break;
             default:

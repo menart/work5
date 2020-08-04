@@ -1,7 +1,9 @@
 # work5
 ### PHP
 
-:black_square_button:    
+:white_check_mark:     
+> time left: 4.5 hour
+  
 -----
 
 Создать страницу с авторизацией пользователя: логин и пароль и реализовать в ней:

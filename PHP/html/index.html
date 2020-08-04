@@ -10,7 +10,7 @@
         .card {
             float: left;
             width: 400px;
-            height: 300px;
+            height: 350px;
             border: 1px solid rgba(0, 0, 0, 0.2);
             border-radius: 5px;
             padding: 5px;
@@ -41,36 +41,55 @@
             margin: 10px auto;
             width: 1000px;
         }
+
+        .second {
+            display: none;
+        }
     </style>
 </head>
 <body>
 <div class="box">
-    <div id="authUser" class="card">
+    <div id="authUser" class="card first">
         <h3>Введите логин и пароль</h3>
         <span>Логин:</span> <input type="text" id="login_auth" name="login_auth" placeholder="Логин">
         <span>Пароль:</span> <input type="password" name="pwd_auth" id="pwd_auth">
         <a href="#" id="auth">Войти</a>
     </div>
-    <div id="regUser" class="card">
+    <div id="regUser" class="card first">
         <h3>Или зарегистрируйтесь</h3>
-        <span>Логин</span><input type="text" name="login" placeholder="логин">
-        <span>Фамилия И.О.</span><input type="text" name="fio" placeholder="Фамилия И.О.">
-        <span>E-Mail</span><input type="text" name="email" placeholder="email">
-        <span>Пароль</span><input type="password" name="pwd">
+        <span>Логин</span><input type="text" name="login" id="login" placeholder="логин">
+        <span>Фамилия И.О.</span><input type="text" name="fio" id="fio" placeholder="Фамилия И.О.">
+        <span>E-Mail</span><input type="text" name="email" id="email" placeholder="email">
+        <span>Пароль</span><input type="password" name="pwd" id="pwd">
         <a href="#" id="reg">Зарегистрироваться</a>
+    </div>
+    <div id="officeUser" class="card second">
+        <h3>Личный кабинет</h3>
+        <span>Логин</span><input type="text" name="login_edit" id="login_edit" placeholder="логин">
+        <span>Фамилия И.О.</span><input type="text" name="fio_edit" id="fio_edit" placeholder="Фамилия И.О.">
+        <span>E-Mail</span><input type="text" name="email_edit" id="email_edit" placeholder="email">
+        <span>Пароль</span><input type="password" name="pwd_edit" id="pwd_edit">
+        <a href="#" id="edit">Изменить</a>
+        <a href="#" id="logout">Выйти</a>
     </div>
 </div>
 <script>
     const API_URL = 'point.php';
 
-    const authBtn = document.getElementById('authUser'),
-        regUser = document.getElementById('regUser'),
+    const authBtn = document.getElementById('auth'),
+        regBtn = document.getElementById('reg'),
+        editBtn = document.getElementById('edit'),
+        logoutBtn = document.getElementById('logout'),
         loginAuth = document.getElementById('login_auth'),
         pwdAuth = document.getElementById('pwd_auth'),
-        login= document.getElementById('login'),
+        login = document.getElementById('login'),
         pwd = document.getElementById('pwd'),
         email = document.getElementById('email'),
-        fio = document.getElementById('fio');
+        fio = document.getElementById('fio'),
+        loginEdit = document.getElementById('login_edit'),
+        pwdEdit = document.getElementById('pwd_edit'),
+        emailEdit = document.getElementById('email_edit'),
+        fioEdit = document.getElementById('fio_edit');
 
 
     const DBQuery = class {
@@ -99,30 +118,70 @@
             return this.getData(`${API_URL}?action=create`, body)
         }
 
-        getCard = (id) => this.getData(`${API_URL}tv/${id}?api_key=${API_KEY}&language=ru-RU`);
-    }
+        getEditUser = (login, pwd, email, fio) => {
+            let body = 'login=' + login + '&pwd=' + pwd + '&email=' + email + '&fio=' + fio;
+            return this.getData(`${API_URL}?action=edit`, body)
+        }
 
-    const auth = (login, pwd, email, fio) => {
-        new DBQuery().getCreateUser(login, pwd, email, fio).then(alert(1));
-    }
-
-    const create = (login, pwd) => {
-        new DBQuery().getAuth(login, pwd).then(alert(1));
+        getLogout = () => {
+            return this.getData(`${API_URL}?action=logout`, '')
+        }
     }
 
     authBtn.addEventListener('click', () => {
-        let login = loginAuth.value.trim();
-        let pwd = pwdAuth.value.trim();
-        new DBQuery().getAuth(login, pwd).then(alert(1));
+        let loginVar = loginAuth.value.trim();
+        let pwdVar = pwdAuth.value.trim();
+        new DBQuery().getAuth(loginVar, pwdVar).then(readData);
     });
 
-    regUser.addEventListener('click', () => {
-        let login = login.value.trim();
-        let pwd = pwd.value.trim();
-        let email = email.value.trim();
-        let fio = fio.value.trim();
-        new DBQuery().getCreateUser(login, pwd, email, fio).then(alert(1));
+    logoutBtn.addEventListener('click', () => {
+        new DBQuery().getLogout().then(readData);
     });
+
+    regBtn.addEventListener('click', () => {
+        let loginVar = login.value.trim();
+        let pwdVar = pwd.value.trim();
+        let emailVar = email.value.trim();
+        let fioVar = fio.value.trim();
+        new DBQuery().getCreateUser(loginVar, pwdVar, emailVar, fioVar).then(readData);
+    });
+
+    editBtn.addEventListener('click', () => {
+        let loginVar = loginEdit.value.trim();
+        let pwdVar = pwdEdit.value.trim();
+        let emailVar = emailEdit.value.trim();
+        let fioVar = fioEdit.value.trim();
+        new DBQuery().getEditUser(loginVar, pwdVar, emailVar, fioVar).then(readData);
+    });
+
+    const readData = jsonData => {
+        if (jsonData.id > 0) {
+            let first =document.getElementsByClassName('first');
+            for(let i=0; i<first.length;i++) {
+                first[i].style.display = 'none';
+            }
+
+            let second = document.getElementsByClassName('second');
+            for(let i=0; i<second.length;i++) {
+                second[i].style.display = 'block';
+            }
+            loginEdit.value = jsonData.login;
+            emailEdit.value = jsonData.email;
+            fioEdit.value = jsonData.fio;
+
+        } else {
+            let first =document.getElementsByClassName('first');
+            for(let i=0; i<first.length;i++) {
+                first[i].style.display = 'block';
+            }
+
+            let second = document.getElementsByClassName('second');
+            for(let i=0; i<second.length;i++) {
+                second[i].style.display = 'none';
+            }
+            alert('Не верное имя пользователя или пароль!');
+        }
+    }
 </script>
 
 </body>
